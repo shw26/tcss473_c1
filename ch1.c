@@ -25,6 +25,8 @@ void turnRight()
 //set the robot turing left.
 void turnLeft()
 {
+	int ratio = random(9);
+	//int newRatio = (50%ratio) * ratio;
 	setMotorSpeed(leftMotor,30);
 	setMotorSpeed(rightMotor,60);
 }
@@ -33,7 +35,26 @@ void stopMoving()
 {
 	setMotorSpeed(leftMotor,0);
 	setMotorSpeed(rightMotor,0);
-	delay(2000);
+	delay(1000);
+}
+
+task randomWalk()
+{
+
+
+	while(true){
+
+		int direction = random(2);
+		if (direction == 0){
+			moveforward();
+		} else if (direction == 1){
+			turnRight();
+		} else if (direction == 2){
+			turnLeft();
+		}
+		int randomDelayTime = random(5);
+		delay(randomDelayTime* 400); //min: 400ms, max: 2000ms.
+	}
 }
 
 //main
@@ -41,6 +62,8 @@ task main()
 {
 	//startTask(Moveforward);
 	moveforward();
+	startTask(randomWalk);
+
 
 	while(true){
 		bool right = false;
@@ -60,31 +83,31 @@ task main()
 			}
 		}
 		if (left == true || right == true){
-0
+			stopTask(randomWalk);
 			if (left == true && right == true){		//bump into wall
-
 				playTone(784, 15); //beep
 				//reverse and turn to somewhere
 				reverse(true);
-				turnRight();
+				turnRight(); //this will be changed to other position.
 				delay(1000);
 				stopMoving();
 				} else if (right == true) {		//only the right side hit the wall
-				playTone(300, 15); //beep
-				//reverse right, points to other direction
-				reverse(true);
-				turnRight();
-				delay(1000);
+					playTone(300, 15); //beep
+					//reverse right, points to other direction
+					reverse(true);
+					turnRight();
+					delay(1000);
 				}else if (left == true) { 		//only the left side hit the wall
-				playTone(1200, 15); //beep
-				//reverse left
-				reverse(true);
-				turnLeft();
-				delay(1000);
-			}
+					playTone(1200, 15); //beep
+					//reverse left
+					reverse(true);
+					turnLeft();
+					delay(1000);
+				}
 			//start wandering
 			reverse(false); //move forward.
 			moveforward();
+			startTask(randomWalk);
 		}
 	}
 }
